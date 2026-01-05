@@ -12,7 +12,6 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // In a real app, you would typically clear the authentication state here
               Navigator.pushReplacementNamed(context, '/login');
             },
           ),

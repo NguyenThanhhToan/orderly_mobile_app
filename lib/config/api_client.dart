@@ -1,3 +1,4 @@
+// lib/config/api_client.dart
 import 'package:dio/dio.dart';
 
 class ApiClient {
@@ -22,28 +23,6 @@ class ApiClient {
   }) async {
     try {
       return await dio.post(url, data: body);
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
-
-  Future<Response> put(
-    String url, {
-    dynamic body,
-  }) async {
-    try {
-      return await dio.put(url, data: body);
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
-
-  Future<Response> delete(
-    String url, {
-    dynamic body,
-  }) async {
-    try {
-      return await dio.delete(url, data: body);
     } on DioException catch (e) {
       throw _handleError(e);
     }

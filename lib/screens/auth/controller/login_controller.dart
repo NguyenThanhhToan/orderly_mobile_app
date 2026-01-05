@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:orderly/service/authService/auth_service.dart';
 import '../../home_screen.dart';
 
 class LoginController extends GetxController {
+  final AuthService authService;
+
+  LoginController(this.authService);
+
   final formKey = GlobalKey<FormState>();
 
   final usernameController = TextEditingController();
@@ -27,15 +32,29 @@ class LoginController extends GetxController {
     return null;
   }
 
-  void login() {
+  Future<void> login() async {
     if (!formKey.currentState!.validate()) return;
 
     loading.value = true;
 
-    Future.delayed(const Duration(seconds: 1), () {
-      loading.value = false;
+    try {
+      await authService.login(
+        email: usernameController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
       Get.offAll(() => const HomeScreen());
-    });
+    } catch (e) {
+      Get.snackbar(
+        'Đăng nhập thất bại',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.black,
+      );
+    } finally {
+      loading.value = false;
+    }
   }
 
   @override
@@ -45,4 +64,3 @@ class LoginController extends GetxController {
     super.onClose();
   }
 }
-
