@@ -14,14 +14,16 @@ class HomeController extends GetxController {
     loadTables();
   }
 
+  Future<void> reloadTables() async {
+    await loadTables();
+  }
+
   Future<void> loadTables() async {
     try {
       isTableLoading.value = true;
       final tableList = await _tableService.getTables();
-      print("tableList==========================: ${tableList}");
       tables.assignAll(tableList);
     } catch (e) {
-      print("tableList==========================: ${e}");
       tables.clear();
       rethrow;
     } finally {
