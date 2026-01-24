@@ -4,6 +4,8 @@ import 'package:orderly/screens/home/controller/home_controller.dart';
 import 'package:orderly/state/auth_controller.dart';
 import 'package:orderly/screens/home/widget/table_card.dart';
 
+import '../../router/app_route.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -26,6 +28,13 @@ class HomeScreen extends StatelessWidget {
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.toNamed(AppRoutes.menu);
+          // xử lý
+        },
+        child: const Icon(Icons.add),
       ),
 
       body: Obx(() {

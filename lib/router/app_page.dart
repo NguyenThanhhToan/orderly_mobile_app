@@ -7,7 +7,11 @@ import 'package:orderly/screens/tableDetail/table_detail_screen.dart';
 import 'package:orderly/service/authService/auth_service.dart';
 import 'package:orderly/state/auth_controller.dart';
 import 'package:orderly/screens/tableDetail/controller/table_detail_controller.dart';
+import '../screens/menu/controller/menu_page_controller.dart';
+import '../screens/menu/menu_screen.dart';
+import '../service/productService/product_service.dart';
 import 'app_route.dart';
+
 
 class AppPages {
   static final routes = [
@@ -32,6 +36,14 @@ class AppPages {
       page: () => const TableDetailScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut(() => TableDetailController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.menu,
+      page: () => MenuScreen(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<ProductService>(() => ProductService());
+        Get.lazyPut<MenuPageController>(() => MenuPageController());
       }),
     ),
   ];
