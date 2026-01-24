@@ -1,7 +1,8 @@
 import 'package:get/get.dart';
 import 'package:orderly/screens/auth/controller/login_controller.dart';
 import 'package:orderly/screens/auth/login_screen.dart';
-import 'package:orderly/screens/home_screen.dart';
+import 'package:orderly/screens/home/controller/home_controller.dart';
+import 'package:orderly/screens/home/home_screen.dart';
 import 'package:orderly/service/authService/auth_service.dart';
 import 'package:orderly/state/auth_controller.dart';
 import 'app_route.dart';
@@ -21,6 +22,7 @@ class AppPages {
       page: () => const HomeScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut(() => AuthController());
+        Get.lazyPut(() => HomeController());
       }),
     ),
   ];

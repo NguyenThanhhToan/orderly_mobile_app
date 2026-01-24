@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:orderly/service/authService/auth_service.dart';
 import 'package:orderly/state/auth_controller.dart';
-import '../../home_screen.dart';
 
 class LoginController extends GetxController {
   final AuthService authService;
@@ -46,7 +45,7 @@ class LoginController extends GetxController {
       );
       
 
-      Get.offAll(() => const HomeScreen());
+       Get.offAllNamed('/home');
     } catch (e) {
       Get.snackbar(
         'Đăng nhập thất bại',
