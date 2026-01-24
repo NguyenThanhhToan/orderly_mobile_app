@@ -11,7 +11,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Get.find<AuthController>();
     final home = Get.find<HomeController>();
-    print( "home.tables: =========${home.tables}");
 
     return Scaffold(
       appBar: AppBar(
@@ -71,9 +70,6 @@ class HomeScreen extends StatelessWidget {
 
                     return TableCard(
                       table: table,
-                      onTap: () {
-                        print('Clicked table: ${table.tableCode}');
-                      },
                     );
                   },
                 ),

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:orderly/data/model/table.dart';
+import 'package:orderly/router/app_route.dart';
 
 class TableCard extends StatelessWidget {
   final TableModel table;
-  final VoidCallback? onTap;
 
   const TableCard({
     super.key,
     required this.table,
-    this.onTap,
   });
 
   bool get isAvailable => table.status == 'AVAILABLE';
@@ -16,7 +16,16 @@ class TableCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () async {
+        try {
+          await Get.toNamed(
+            AppRoutes.tableDetail,
+            arguments: table,
+          );
+        } catch (e) {
+          print('Navigation error: $e');
+        }
+      },
       child: Container(
         decoration: BoxDecoration(
           color: isAvailable ? Colors.white : Colors.orange.shade400,
