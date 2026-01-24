@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:orderly/config/auth_interceptor.dart';
 import 'package:orderly/config/token_storage.dart';
+import 'package:orderly/config/logger_interceptor.dart';
 
 class DioConfig {
   static Dio createDio() {
@@ -24,10 +25,7 @@ class DioConfig {
     );
 
     dio.interceptors.add(
-      LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-      ),
+      LoggerInterceptor(),
     );
 
     return dio;

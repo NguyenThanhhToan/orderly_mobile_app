@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:orderly/service/authService/auth_service.dart';
+import 'package:orderly/state/auth_controller.dart';
 import '../../home_screen.dart';
 
 class LoginController extends GetxController {
   final AuthService authService;
+  final AuthController authController;
 
-  LoginController(this.authService);
+  LoginController(this.authService, this.authController);
 
   final formKey = GlobalKey<FormState>();
 
@@ -42,6 +44,7 @@ class LoginController extends GetxController {
         email: usernameController.text.trim(),
         password: passwordController.text.trim(),
       );
+      
 
       Get.offAll(() => const HomeScreen());
     } catch (e) {
@@ -53,6 +56,7 @@ class LoginController extends GetxController {
         colorText: Colors.black,
       );
     } finally {
+      await authController.loadUserProfile();
       loading.value = false;
     }
   }

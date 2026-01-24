@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:orderly/state/auth_controller.dart';
 import 'controller/login_controller.dart';
 import 'package:orderly/widget/app_button.dart';
 
@@ -7,6 +8,7 @@ class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
   final controller = Get.find<LoginController>();
+  final authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {

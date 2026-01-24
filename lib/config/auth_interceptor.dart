@@ -10,12 +10,25 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final token = await getToken();
+    final publicPaths = [
+      '/auth/login',
+      '/auth/register',
+    ];
 
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+    final isPublic = publicPaths.any((path) {
+      final requestPath = options.path;
+      return requestPath.endsWith(path) || 
+             requestPath.contains(path) ||
+             options.uri.path.endsWith(path);
+    });
+
+    if (!isPublic) {
+      final token = await getToken();
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
-    
+
     super.onRequest(options, handler);
   }
 }
