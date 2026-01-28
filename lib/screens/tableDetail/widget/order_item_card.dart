@@ -23,6 +23,39 @@ class OrderItemCard extends StatelessWidget {
     )} đ';
   }
 
+  void _showRemoveConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Xoá món?'),
+          content: Text(
+            'Bạn có chắc muốn xoá "${item.productName}" khỏi order?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Huỷ'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                onRemove?.call(item);
+              },
+              child: const Text('Xoá'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -81,12 +114,12 @@ class OrderItemCard extends StatelessWidget {
             ),
           ),
 
-          // ❌ Remove Button
+          // ❌ Remove Button with Confirm
           Positioned(
             top: 4,
             right: 4,
             child: GestureDetector(
-              onTap: () => onRemove?.call(item),
+              onTap: () => _showRemoveConfirmDialog(context),
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(

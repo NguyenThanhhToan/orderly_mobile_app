@@ -26,8 +26,66 @@ class TableDetailController extends GetxController {
     print('Item ID: ${item.orderItemId}');
   }
 
-  void removeItem(String? itemId) {
-    print('Remove item ID: $itemId');
+  Future<void> addProductToOrder({
+    required String productId,
+    required int quantity,
+    String? notes,
+  }) async {
+    try {
+      final order = activeOrder.value;
+
+      if (order == null) {
+        Get.snackbar('Lỗi', 'Chưa có order đang hoạt động');
+        return;
+      }
+
+      isLoading.value = true;
+
+      final updatedOrder = await _orderService.addProductToOrder(
+        order.orderId,
+        productId,
+        quantity,
+        notes ?? '',
+      );
+
+      activeOrder.value = updatedOrder;
+
+      activeOrder.refresh();
+      Get.snackbar('Thành công', 'Thêm món thành công');
+
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể thêm món');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> removeItemFromOrder(String itemId) async {
+    try {
+      final order = activeOrder.value;
+
+      if (order == null) {
+        Get.snackbar('Lỗi', 'Chưa có order đang hoạt động');
+        return;
+      }
+
+      isLoading.value = true;
+
+      final updatedOrder = await _orderService.removeProductFromOrder(
+        order.orderId,
+        itemId,
+      );
+
+      activeOrder.value = updatedOrder;
+      activeOrder.refresh();
+
+      Get.snackbar('Thành công', 'Đã xoá món');
+
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể xoá món');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> loadActiveOrder() async {

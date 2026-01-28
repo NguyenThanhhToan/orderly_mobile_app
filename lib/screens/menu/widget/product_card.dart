@@ -3,7 +3,7 @@ import 'package:orderly/data/model/product_model.dart';
 
 class ProductCard extends StatelessWidget {
   final ProductModel product;
-  final VoidCallback onTap;
+  final void Function(String productId) onTap;
 
   const ProductCard({
     super.key,
@@ -18,21 +18,21 @@ class ProductCard extends StatelessWidget {
       color: Colors.white,
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        onTap: onTap,
+        onTap: () => onTap(product.productId),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: ClipRRect(
                 borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(8)),
+                    const BorderRadius.vertical(top: Radius.circular(8)),
                 child: product.imageUrl != null
                     ? Image.network(
-                  product.imageUrl!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  errorBuilder: (_, __, ___) => _placeholder(),
-                )
+                        product.imageUrl!,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        errorBuilder: (_, __, ___) => _placeholder(),
+                      )
                     : _placeholder(),
               ),
             ),

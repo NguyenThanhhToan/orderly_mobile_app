@@ -28,6 +28,22 @@ class ApiClient {
     }
   }
 
+  Future<Response> delete(
+    String url, {
+    Map<String, dynamic>? query,
+    dynamic body,
+  }) async {
+    try {
+      return await dio.delete(
+        url,
+        queryParameters: query,
+        data: body,
+      );
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   Exception _handleError(DioException e) {
     final statusCode = e.response?.statusCode;
     final message =

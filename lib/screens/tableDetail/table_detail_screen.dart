@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:orderly/router/app_route.dart';
 import 'package:orderly/screens/tableDetail/controller/table_detail_controller.dart';
 import 'package:orderly/screens/tableDetail/widget/order_item_card.dart';
 
@@ -24,12 +25,26 @@ class TableDetailScreen extends StatelessWidget {
         centerTitle: true,
       ),
 
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 20, 32),
+        child: Transform.scale(
+          scale: 1.2,
+          child: FloatingActionButton(
+            onPressed: () {
+              Get.toNamed(AppRoutes.menu);
+            },
+            child: const Icon(Icons.add, size: 30),
+          ),
+        ),
+      ),
+
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
         final order = controller.activeOrder.value;
+        print(order?.orderId);
 
         // Nếu chưa có order
         if (order == null) {
@@ -98,7 +113,7 @@ class TableDetailScreen extends StatelessWidget {
                       controller.openItemActions(item);
                     },
                     onRemove: (item) {
-                      controller.removeItem(item.orderItemId);
+                      controller.removeItemFromOrder(item.orderItemId);
                     },
                   )) ?? [],
                 ],
