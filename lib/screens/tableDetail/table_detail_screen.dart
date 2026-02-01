@@ -25,18 +25,47 @@ class TableDetailScreen extends StatelessWidget {
         centerTitle: true,
       ),
 
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 20, 32),
-        child: Transform.scale(
-          scale: 1.2,
-          child: FloatingActionButton(
-            onPressed: () {
-              Get.toNamed(AppRoutes.menu);
-            },
-            child: const Icon(Icons.add, size: 30),
+      // ===== MULTI FAB =====
+      floatingActionButton: Obx(() {
+        final order = controller.activeOrder.value;
+        final isPaid = order?.status == 'PAID';
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 20, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ===== CONFIRM BUTTON =====
+              if (!isPaid)
+                Transform.scale(
+                  scale: 1.2,
+                  child: FloatingActionButton(
+                    heroTag: 'confirm',
+                    backgroundColor: Colors.orange,
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : controller.confirmOrder,
+                    child: const Icon(Icons.check, size: 28),
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+
+              // ===== ADD PRODUCT BUTTON =====
+              Transform.scale(
+                scale: 1.2,
+                child: FloatingActionButton(
+                  heroTag: 'add',
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.menu);
+                  },
+                  child: const Icon(Icons.add, size: 30),
+                ),
+              ),
+            ],
           ),
-        ),
-      ),
+        );
+      }),
 
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -44,9 +73,7 @@ class TableDetailScreen extends StatelessWidget {
         }
 
         final order = controller.activeOrder.value;
-        print(order?.orderId);
 
-        // Nếu chưa có order
         if (order == null) {
           return const Center(
             child: Text(
@@ -55,6 +82,8 @@ class TableDetailScreen extends StatelessWidget {
             ),
           );
         }
+
+        final bool isPaid = order.status == 'PAID';
 
         return Column(
           children: [
@@ -76,9 +105,10 @@ class TableDetailScreen extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
-                  Text('Trạng thái: ${order.status ?? ''}'),
-                  const SizedBox(height: 6),
+
                   Text('Tổng món: ${order.totalItems ?? 0}'),
+                  const SizedBox(height: 6),
+
                   Text(
                     'Tổng tiền: ${formatCurrency(order.totalAmount)}',
                     style: const TextStyle(
@@ -87,6 +117,37 @@ class TableDetailScreen extends StatelessWidget {
                       color: Colors.green,
                     ),
                   ),
+
+                  const SizedBox(height: 12),
+
+                  // ===== PAY BUTTON =====
+                  if (!isPaid)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.payment),
+                        label: const Text('Thanh toán'),
+                        style: ElevatedButton.styleFrom(
+                          padding:
+                              const EdgeInsets.symmetric(vertical: 12),
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : controller.payOrder,
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.check_circle,
+                            color: Colors.green),
+                        label: const Text('Đã thanh toán'),
+                        onPressed: null,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -108,14 +169,16 @@ class TableDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   ...order.items?.map((item) => OrderItemCard(
-                    item: item,
-                    onTap: (item) {
-                      controller.openItemActions(item);
-                    },
-                    onRemove: (item) {
-                      controller.removeItemFromOrder(item.orderItemId);
-                    },
-                  )) ?? [],
+                        item: item,
+                        onTap: controller.openItemActions,
+                        onRemove: isPaid
+                            ? null
+                            : (item) {
+                                controller
+                                    .removeItemFromOrder(item.orderItemId);
+                              },
+                      )) ??
+                      [],
                 ],
               ),
             ),

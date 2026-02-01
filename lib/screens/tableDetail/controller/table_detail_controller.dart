@@ -26,6 +26,23 @@ class TableDetailController extends GetxController {
     print('Item ID: ${item.orderItemId}');
   }
 
+  Future<void> openOrder() async {
+    try {
+      isLoading.value = true;
+
+      final newOrder = await _orderService.openOrderByTable(table.id);
+
+      activeOrder.value = newOrder;
+      activeOrder.refresh();
+
+      Get.snackbar('Thành công', 'Đã mở bàn ${table.tableCode}');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể mở bàn');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> addProductToOrder({
     required String productId,
     required int quantity,
@@ -91,10 +108,77 @@ class TableDetailController extends GetxController {
   Future<void> loadActiveOrder() async {
     try {
       isLoading.value = true;
-      final order = await _orderService.getActiveOrderByTable(table.id);
-      activeOrder.value = order;
+
+      // ===== BÀN ĐANG CÓ NGƯỜI =====
+      if (table.status == 'OCCUPIED') {
+        final order = await _orderService.getActiveOrderByTable(table.id);
+        activeOrder.value = order;
+      }
+
+      // ===== BÀN TRỐNG → MỞ BÀN → LẤY ORDER =====
+      else if (table.status == 'AVAILABLE') {
+        // 1. Open order
+        await _orderService.openOrderByTable(table.id);
+
+        // 2. Lấy order vừa mở
+        final order = await _orderService.getActiveOrderByTable(table.id);
+        activeOrder.value = order;
+      }
+
+      activeOrder.refresh();
     } catch (e) {
       activeOrder.value = null;
+      Get.snackbar('Lỗi', 'Không thể tải đơn hàng');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+  Future<void> payOrder() async {
+    try {
+      final order = activeOrder.value;
+
+      if (order == null) {
+        Get.snackbar('Lỗi', 'Không có đơn hàng để thanh toán');
+        return;
+      }
+
+      isLoading.value = true;
+
+      final paidOrder = await _orderService.payOrder(order.orderId);
+
+      activeOrder.value = paidOrder;
+      activeOrder.refresh();
+
+      Get.snackbar('Thành công', 'Thanh toán thành công');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Thanh toán thất bại');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> confirmOrder() async {
+    try {
+      final order = activeOrder.value;
+
+      if (order == null) {
+        Get.snackbar('Lỗi', 'Không có đơn hàng để xác nhận');
+        return;
+      }
+
+      isLoading.value = true;
+
+      final updatedOrder =
+          await _orderService.confirmOrder(order.orderId);
+
+      activeOrder.value = updatedOrder;
+      activeOrder.refresh();
+
+      Get.snackbar('Thành công', 'Đã xác nhận đơn hàng');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Xác nhận đơn hàng thất bại');
     } finally {
       isLoading.value = false;
     }

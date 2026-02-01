@@ -27,7 +27,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-
       body: Obx(() {
         final user = auth.user.value;
 
@@ -35,12 +34,8 @@ class HomeScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (home.isTableLoading.value) {
+        if (home.isTableLoading.value && home.tables.isEmpty) {
           return const Center(child: CircularProgressIndicator());
-        }
-
-        if (home.tables.isEmpty) {
-          return const Center(child: Text('Không có bàn nào'));
         }
 
         return Padding(
@@ -57,23 +52,65 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
+              /// GRID + PULL TO REFRESH
               Expanded(
-                child: GridView.builder(
-                  itemCount: home.tables.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
-                  itemBuilder: (context, index) {
-                    final table = home.tables[index];
-
-                    return TableCard(
-                      table: table,
-                    );
-                  },
+                child: RefreshIndicator(
+                  onRefresh: home.reloadTables,
+                  child: home.tables.isEmpty
+                      ? ListView(
+                          physics:
+                              const AlwaysScrollableScrollPhysics(),
+                          children: const [
+                            SizedBox(height: 200),
+                            Center(child: Text('Không có bàn nào')),
+                          ],
+                        )
+                      : GridView.builder(
+                          physics:
+                              const AlwaysScrollableScrollPhysics(),
+                          itemCount: home.tables.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
+                          itemBuilder: (context, index) {
+                            final table = home.tables[index];
+                            return TableCard(table: table);
+                          },
+                        ),
                 ),
               ),
+
+              const SizedBox(height: 8),
+
+              /// PAGINATION BAR
+              Obx(() {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.chevron_left),
+                      onPressed: home.currentPage.value > 0
+                          ? home.previousPage
+                          : null,
+                    ),
+                    Text(
+                      'Trang ${home.currentPage.value + 1}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.chevron_right),
+                      onPressed: home.hasMore.value
+                          ? home.nextPage
+                          : null,
+                    ),
+                  ],
+                );
+              }),
             ],
           ),
         );

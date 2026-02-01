@@ -22,8 +22,25 @@ class OrderService {
     return apiResponse.data!;
   }
 
+  Future<OrderModel> openOrderByTable(String tableId) async {
+    final response = await api.post(
+      '/orders/tables/$tableId/open',
+    );
 
-Future<OrderModel> addProductToOrder(String orderId, String productId, int quantity, String notes) async {
+    final apiResponse = ApiResponse<OrderModel>.fromJson(
+      response.data,
+      (json) => OrderModel.fromJson(json),
+    );
+
+    if (!apiResponse.succeed || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Get active order failed');
+    }
+
+    return apiResponse.data!;
+  }
+
+
+  Future<OrderModel> addProductToOrder(String orderId, String productId, int quantity, String notes) async {
     final response = await api.post(
       '/orders/$orderId/items',
       body: {
@@ -59,4 +76,38 @@ Future<OrderModel> addProductToOrder(String orderId, String productId, int quant
     }
     return apiResponse.data!;
   }  
+
+Future<OrderModel> confirmOrder(String orderId) async {
+    final response = await api.post(
+      '/orders/$orderId/confirm',
+    );
+
+    final apiResponse = ApiResponse<OrderModel>.fromJson(
+      response.data,
+      (json) => OrderModel.fromJson(json),
+    );
+
+    if (!apiResponse.succeed || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Confirm order failed');
+    }
+
+    return apiResponse.data!;
+  }
+
+  Future<OrderModel> payOrder(String orderId) async {
+    final response = await api.post(
+      '/orders/$orderId/pay',
+    );
+
+    final apiResponse = ApiResponse<OrderModel>.fromJson(
+      response.data,
+      (json) => OrderModel.fromJson(json),
+    );
+
+    if (!apiResponse.succeed || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Pay order failed');
+    }
+
+    return apiResponse.data!;
+  }
 }
