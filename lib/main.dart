@@ -9,11 +9,19 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
 
-  runApp(const MyApp());
+  // Initialize token storage and auth controller
+  final authController = Get.put(AuthController(), permanent: true);
+  
+  // Check if user is logged in
+  final isLoggedIn = await authController.checkLoginStatus();
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -24,15 +32,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-
-      initialBinding: BindingsBuilder(() {
-        Get.put<AuthController>(
-          AuthController(),
-          permanent: true,
-        );
-      }),
-
-      initialRoute: AppRoutes.login,
+      // Set initial route based on login status
+      initialRoute: isLoggedIn ? AppRoutes.home : AppRoutes.login,
       getPages: AppPages.routes,
     );
   }

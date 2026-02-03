@@ -13,20 +13,32 @@ class HomeScreen extends StatelessWidget {
     final home = Get.find<HomeController>();
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
+
+      // ===== APP BAR =====
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
         title: Obx(() {
           final user = auth.user.value;
-          return Text(user?.fullName ?? 'Nhân viên');
+          return Text(
+            user?.fullName ?? 'Nhân viên',
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          );
         }),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.black),
             onPressed: () {
-              Get.offAllNamed('/login');
+              auth.logout();
             },
           ),
         ],
       ),
+
       body: Obx(() {
         final user = auth.user.value;
 
@@ -39,20 +51,53 @@ class HomeScreen extends StatelessWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Xin chào ${user.fullName}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              // ===== HEADER CARD =====
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.table_bar, size: 36, color: Colors.blue),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Xin chào, ${user.fullName}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Chọn bàn để bắt đầu phục vụ',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
+
               const SizedBox(height: 12),
 
-              /// GRID + PULL TO REFRESH
+              // ===== GRID TABLE =====
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: home.reloadTables,
@@ -62,7 +107,15 @@ class HomeScreen extends StatelessWidget {
                               const AlwaysScrollableScrollPhysics(),
                           children: const [
                             SizedBox(height: 200),
-                            Center(child: Text('Không có bàn nào')),
+                            Center(
+                              child: Text(
+                                'Không có bàn nào',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
                           ],
                         )
                       : GridView.builder(
@@ -74,6 +127,7 @@ class HomeScreen extends StatelessWidget {
                             crossAxisCount: 3,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
+                            childAspectRatio: 1,
                           ),
                           itemBuilder: (context, index) {
                             final table = home.tables[index];
@@ -85,32 +139,47 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              /// PAGINATION BAR
-              Obx(() {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.chevron_left),
-                      onPressed: home.currentPage.value > 0
-                          ? home.previousPage
-                          : null,
-                    ),
-                    Text(
-                      'Trang ${home.currentPage.value + 1}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.chevron_right),
-                      onPressed: home.hasMore.value
-                          ? home.nextPage
-                          : null,
+              // ===== PAGINATION BAR =====
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
                   ],
-                );
-              }),
+                ),
+                child: Obx(() {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.chevron_left),
+                        onPressed: home.currentPage.value > 0
+                            ? home.previousPage
+                            : null,
+                      ),
+                      Text(
+                        'Trang ${home.currentPage.value + 1}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.chevron_right),
+                        onPressed: home.hasMore.value
+                            ? home.nextPage
+                            : null,
+                      ),
+                    ],
+                  );
+                }),
+              ),
             ],
           ),
         );

@@ -3,6 +3,7 @@ class OrderItemModel {
   final String? productId;
   final String? productName;
   final String? imageUrl;
+  final int? batchNo;
   final int? quantity;
   final int? unitPrice;
   final int? totalPrice;
@@ -13,6 +14,7 @@ class OrderItemModel {
     this.productId,
     this.productName,
     this.imageUrl,
+    this.batchNo,
     this.quantity,
     this.unitPrice,
     this.totalPrice,
@@ -25,6 +27,7 @@ class OrderItemModel {
       productId: json['productId'],
       productName: json['productName'],
       imageUrl: json['imageUrl'],
+      batchNo: json['batchNo'],
       quantity: json['quantity'],
       unitPrice: json['unitPrice'],
       totalPrice: json['totalPrice'],
@@ -38,6 +41,7 @@ class OrderItemModel {
       'productId': productId,
       'productName': productName,
       'imageUrl': imageUrl,
+      'batchNo': batchNo,
       'quantity': quantity,
       'unitPrice': unitPrice,
       'totalPrice': totalPrice,

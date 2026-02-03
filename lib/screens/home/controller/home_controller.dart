@@ -9,7 +9,7 @@ class HomeController extends GetxController {
   final RxBool isTableLoading = false.obs;
 
   final RxInt currentPage = 0.obs;
-  final int pageSize = 9; // 3 cột x 3 hàng cho đẹp UI
+  final int pageSize = 15;
   final RxBool hasMore = true.obs;
 
   @override

@@ -170,11 +170,9 @@ class TableDetailController extends GetxController {
 
       isLoading.value = true;
 
-      final updatedOrder =
-          await _orderService.confirmOrder(order.orderId);
-
+      await _orderService.confirmOrder(order.orderId);
+      final updatedOrder = await _orderService.getActiveOrderByTable(table.id);
       activeOrder.value = updatedOrder;
-      activeOrder.refresh();
 
       Get.snackbar('Thành công', 'Đã xác nhận đơn hàng');
     } catch (e) {

@@ -15,6 +15,11 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
 
   final loading = false.obs;
+  final isPasswordHidden = true.obs;
+
+  void togglePasswordVisibility() {
+    isPasswordHidden.toggle();
+  }
 
   String? validateUsername(String? value) {
     if (value == null || value.trim().isEmpty) {
@@ -43,9 +48,8 @@ class LoginController extends GetxController {
         email: usernameController.text.trim(),
         password: passwordController.text.trim(),
       );
-      
 
-       Get.offAllNamed('/home');
+      Get.offAllNamed('/home');
     } catch (e) {
       Get.snackbar(
         'Đăng nhập thất bại',
