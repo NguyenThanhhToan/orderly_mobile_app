@@ -14,18 +14,21 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      borderRadius: BorderRadius.circular(8),
+      elevation: 3,
+      borderRadius: BorderRadius.circular(14),
+      shadowColor: Colors.black12,
       color: Colors.white,
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(14),
         onTap: () => onTap(product.productId),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // IMAGE
             Expanded(
               child: ClipRRect(
                 borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(8)),
+                    const BorderRadius.vertical(top: Radius.circular(14)),
                 child: product.imageUrl != null
                     ? Image.network(
                         product.imageUrl!,
@@ -36,8 +39,10 @@ class ProductCard extends StatelessWidget {
                     : _placeholder(),
               ),
             ),
+
+            // INFO
             Padding(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -45,13 +50,17 @@ class ProductCard extends StatelessWidget {
                     product.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 13),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     '${product.price} đ',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                       color: Colors.orange,
                     ),
                   ),
@@ -66,9 +75,13 @@ class ProductCard extends StatelessWidget {
 
   Widget _placeholder() {
     return Container(
-      color: Colors.grey.shade200,
+      color: Colors.grey.shade100,
       alignment: Alignment.center,
-      child: const Icon(Icons.fastfood, size: 40),
+      child: Icon(
+        Icons.fastfood,
+        size: 40,
+        color: Colors.grey.shade400,
+      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:orderly/router/app_route.dart';
 import 'package:orderly/screens/home/controller/home_controller.dart';
 import 'package:orderly/screens/tableDetail/controller/table_detail_controller.dart';
 import 'package:orderly/screens/tableDetail/widget/order_item_card.dart';
+import 'package:orderly/screens/tableDetail/widget/payment_preview_dialog.dart';
 
 class TableDetailScreen extends StatelessWidget {
   const TableDetailScreen({super.key});
@@ -130,29 +131,87 @@ class TableDetailScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
+
+                    /// ===== BUTTON AREA =====
                     if (!isPaid)
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.payment),
-                          label: const Text('Thanh toán'),
-                          style: ElevatedButton.styleFrom(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 12),
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.payment),
+                              label: const Text('Thanh toán'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: controller.isLoading.value
+                                  ? null
+                                  : () {
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (_) => PaymentPreviewDialog(
+                                          order: order,
+                                          controller: controller,
+                                        ),
+                                      );
+                                    },
+                            ),
                           ),
-                          onPressed: controller.isLoading.value
-                              ? null
-                              : controller.payOrder,
-                        ),
+
+                          const SizedBox(width: 12),              
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.cancel, color: Colors.white),
+                              label: const Text(
+                                'Huỷ bàn',
+                                style: TextStyle(color: Colors.white),
+                              ),
+  
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: controller.isLoading.value
+                                  ? null
+                                  : () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                          title: const Text('Xác nhận'),
+                                          content: const Text(
+                                            'Bạn có chắc chắn muốn huỷ bàn này không?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              child: const Text('Không'),
+                                              onPressed: () => Navigator.pop(context),
+                                            ),
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                              ),
+                                              child: const Text('Huỷ bàn'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                controller.cancelOrder();
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                            ),
+                          ),
+                        ],
                       )
                     else
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
-                          icon: const Icon(Icons.check_circle,
-                              color: Colors.green),
+                          icon: const Icon(Icons.check_circle, color: Colors.green),
                           label: const Text('Đã thanh toán'),
                           onPressed: null,
                         ),
@@ -160,6 +219,7 @@ class TableDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
 
               const SizedBox(height: 12),
 

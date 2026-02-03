@@ -18,6 +18,20 @@ class TableDetailController extends GetxController {
 
     table = Get.arguments as TableModel;
 
+    ever<OrderModel?>(activeOrder, (order) {
+      if (order != null && order.status == 'PAID') {
+        Future.microtask(() {
+          if (Get.isOverlaysOpen) {
+            Get.back(closeOverlays: true);
+          }
+
+          if (Get.key.currentState?.canPop() ?? false) {
+            Get.back();
+          }
+        });
+      }
+    });
+
     loadActiveOrder();
   }
 
@@ -26,18 +40,23 @@ class TableDetailController extends GetxController {
     print('Item ID: ${item.orderItemId}');
   }
 
-  Future<void> openOrder() async {
+  Future<void> loadActiveOrder() async {
     try {
       isLoading.value = true;
 
-      final newOrder = await _orderService.openOrderByTable(table.id);
+      if (table.status == 'OCCUPIED') {
+        final order = await _orderService.getActiveOrderByTable(table.id);
+        activeOrder.value = order;
+      } else if (table.status == 'AVAILABLE') {
+        await _orderService.openOrderByTable(table.id);
+        final order = await _orderService.getActiveOrderByTable(table.id);
+        activeOrder.value = order;
+      }
 
-      activeOrder.value = newOrder;
       activeOrder.refresh();
-
-      Get.snackbar('Thành công', 'Đã mở bàn ${table.tableCode}');
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể mở bàn');
+      activeOrder.value = null;
+      Get.snackbar('Lỗi', 'Không thể tải đơn hàng');
     } finally {
       isLoading.value = false;
     }
@@ -50,7 +69,6 @@ class TableDetailController extends GetxController {
   }) async {
     try {
       final order = activeOrder.value;
-
       if (order == null) {
         Get.snackbar('Lỗi', 'Chưa có order đang hoạt động');
         return;
@@ -66,10 +84,9 @@ class TableDetailController extends GetxController {
       );
 
       activeOrder.value = updatedOrder;
-
       activeOrder.refresh();
-      Get.snackbar('Thành công', 'Thêm món thành công');
 
+      Get.snackbar('Thành công', 'Thêm món thành công');
     } catch (e) {
       Get.snackbar('Lỗi', 'Không thể thêm món');
     } finally {
@@ -80,7 +97,6 @@ class TableDetailController extends GetxController {
   Future<void> removeItemFromOrder(String itemId) async {
     try {
       final order = activeOrder.value;
-
       if (order == null) {
         Get.snackbar('Lỗi', 'Chưa có order đang hoạt động');
         return;
@@ -97,7 +113,6 @@ class TableDetailController extends GetxController {
       activeOrder.refresh();
 
       Get.snackbar('Thành công', 'Đã xoá món');
-
     } catch (e) {
       Get.snackbar('Lỗi', 'Không thể xoá món');
     } finally {
@@ -105,40 +120,59 @@ class TableDetailController extends GetxController {
     }
   }
 
-  Future<void> loadActiveOrder() async {
+  Future<void> confirmOrder() async {
     try {
+      final order = activeOrder.value;
+      if (order == null) {
+        Get.snackbar('Lỗi', 'Không có đơn hàng để xác nhận');
+        return;
+      }
+
       isLoading.value = true;
 
-      // ===== BÀN ĐANG CÓ NGƯỜI =====
-      if (table.status == 'OCCUPIED') {
-        final order = await _orderService.getActiveOrderByTable(table.id);
-        activeOrder.value = order;
-      }
+      await _orderService.confirmOrder(order.orderId);
+      final updatedOrder =
+          await _orderService.getActiveOrderByTable(table.id);
 
-      // ===== BÀN TRỐNG → MỞ BÀN → LẤY ORDER =====
-      else if (table.status == 'AVAILABLE') {
-        // 1. Open order
-        await _orderService.openOrderByTable(table.id);
-
-        // 2. Lấy order vừa mở
-        final order = await _orderService.getActiveOrderByTable(table.id);
-        activeOrder.value = order;
-      }
-
+      activeOrder.value = updatedOrder;
       activeOrder.refresh();
+
+      Get.snackbar('Thành công', 'Đã xác nhận đơn hàng');
     } catch (e) {
-      activeOrder.value = null;
-      Get.snackbar('Lỗi', 'Không thể tải đơn hàng');
+      Get.snackbar('Lỗi', 'Xác nhận đơn hàng thất bại');
     } finally {
       isLoading.value = false;
     }
   }
 
+  Future<void> cancelOrder() async {
+    try {
+      final order = activeOrder.value;
+      if (order == null) {
+        Get.snackbar('Lỗi', 'Không có bàn để hủy');
+        return;
+      }
+
+      isLoading.value = true;
+
+      await _orderService.cancelOrder(order.orderId);
+      final updatedOrder =
+          await _orderService.getActiveOrderByTable(table.id);
+
+      activeOrder.value = updatedOrder;
+      activeOrder.refresh();
+
+      Get.snackbar('Thành công', 'Đã hủy bàn');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Hủy bàn thất bại');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   Future<void> payOrder() async {
     try {
       final order = activeOrder.value;
-
       if (order == null) {
         Get.snackbar('Lỗi', 'Không có đơn hàng để thanh toán');
         return;
@@ -154,29 +188,6 @@ class TableDetailController extends GetxController {
       Get.snackbar('Thành công', 'Thanh toán thành công');
     } catch (e) {
       Get.snackbar('Lỗi', 'Thanh toán thất bại');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> confirmOrder() async {
-    try {
-      final order = activeOrder.value;
-
-      if (order == null) {
-        Get.snackbar('Lỗi', 'Không có đơn hàng để xác nhận');
-        return;
-      }
-
-      isLoading.value = true;
-
-      await _orderService.confirmOrder(order.orderId);
-      final updatedOrder = await _orderService.getActiveOrderByTable(table.id);
-      activeOrder.value = updatedOrder;
-
-      Get.snackbar('Thành công', 'Đã xác nhận đơn hàng');
-    } catch (e) {
-      Get.snackbar('Lỗi', 'Xác nhận đơn hàng thất bại');
     } finally {
       isLoading.value = false;
     }

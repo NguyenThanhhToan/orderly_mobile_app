@@ -77,9 +77,26 @@ class OrderService {
     return apiResponse.data!;
   }  
 
-Future<OrderModel> confirmOrder(String orderId) async {
+  Future<OrderModel> confirmOrder(String orderId) async {
     final response = await api.post(
       '/orders/$orderId/confirm',
+    );
+
+    final apiResponse = ApiResponse<OrderModel>.fromJson(
+      response.data,
+      (json) => OrderModel.fromJson(json),
+    );
+
+    if (!apiResponse.succeed || apiResponse.data == null) {
+      throw Exception(apiResponse.message ?? 'Confirm order failed');
+    }
+
+    return apiResponse.data!;
+  }
+
+  Future<OrderModel> cancelOrder(String orderId) async {
+    final response = await api.post(
+      '/orders/$orderId/cancel',
     );
 
     final apiResponse = ApiResponse<OrderModel>.fromJson(

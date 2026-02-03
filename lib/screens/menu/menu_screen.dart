@@ -14,14 +14,26 @@ class MenuScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Đơn đẹp'),
+          title: const Text(
+            'Menu',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          elevation: 0,
           bottom: const TabBar(
+            indicatorSize: TabBarIndicatorSize.label,
+            indicatorWeight: 3,
+            indicatorColor: Colors.orange,
+            labelColor: Colors.orange,
+            unselectedLabelColor: Colors.grey,
+            labelStyle: TextStyle(fontWeight: FontWeight.bold),
             tabs: [
               Tab(text: 'Nước uống'),
               Tab(text: 'Đồ ăn'),
             ],
           ),
         ),
+
         body: Obx(() {
           if (menu.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
