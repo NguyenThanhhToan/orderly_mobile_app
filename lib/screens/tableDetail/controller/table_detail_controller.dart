@@ -156,13 +156,18 @@ class TableDetailController extends GetxController {
       isLoading.value = true;
 
       await _orderService.cancelOrder(order.orderId);
-      final updatedOrder =
-          await _orderService.getActiveOrderByTable(table.id);
-
-      activeOrder.value = updatedOrder;
-      activeOrder.refresh();
 
       Get.snackbar('Thành công', 'Đã hủy bàn');
+
+      Future.microtask(() {
+        if (Get.isOverlaysOpen) {
+          Get.back(closeOverlays: true);
+        }
+
+        if (Get.key.currentState?.canPop() ?? false) {
+          Get.back();
+        }
+      });
     } catch (e) {
       Get.snackbar('Lỗi', 'Hủy bàn thất bại');
     } finally {
